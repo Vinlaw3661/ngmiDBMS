@@ -182,3 +182,8 @@ cython_debug/
 
 # VS Code
 .vscode/
+
+# Node / frontend artifacts
+node_modules/
+ui/frontend/node_modules/
+ui/frontend/.vite/

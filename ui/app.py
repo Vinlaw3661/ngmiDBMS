@@ -4,10 +4,11 @@ from typing import Dict, List, Tuple
 import dash
 import dash_cytoscape as cyto
 from dash import Dash, Input, Output, State, dash_table, dcc, html, no_update
+from flask import jsonify, request
 import pandas as pd
-import psycopg2
-from psycopg2 import sql
-from psycopg2.extras import RealDictCursor
+import psycopg
+from psycopg import sql
+from psycopg.rows import dict_row
 
 
 REFRESH_MS = int(os.getenv("NGMI_UI_REFRESH_MS", "5000"))
@@ -15,18 +16,20 @@ ROW_LIMIT = int(os.getenv("NGMI_UI_ROW_LIMIT", "100"))
 
 
 def get_conn():
-    return psycopg2.connect(
+    return psycopg.connect(
         host=os.getenv("DB_HOST", "localhost"),
-        database=os.getenv("DB_NAME", "ngmidbms"),
+        dbname=os.getenv("DB_NAME", "ngmidbms"),
         user=os.getenv("DB_USER", "postgres"),
         password=os.getenv("DB_PASSWORD", "password"),
         port=os.getenv("DB_PORT", "5432"),
+        row_factory=dict_row,
+        autocommit=True,
     )
 
 
 def fetch_all(query, params=None):
     with get_conn() as conn:
-        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+        with conn.cursor() as cur:
             cur.execute(query, params)
             try:
                 return cur.fetchall()
@@ -36,7 +39,7 @@ def fetch_all(query, params=None):
 
 def fetch_statement(statement: sql.SQL, params=None):
     with get_conn() as conn:
-        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+        with conn.cursor() as cur:
             cur.execute(statement, params)
             try:
                 return cur.fetchall()
@@ -478,3 +481,42 @@ def update_table_preview(table, row_limit, _):
 
 if __name__ == "__main__":
     app.run_server(host="0.0.0.0", port=int(os.getenv("PORT", "8050")), debug=True)
+
+
+# --- Minimal JSON API endpoints to support the React frontend (ui/frontend)
+@server.route("/api/schema")
+def api_schema():
+    tables, columns, fks = fetch_schema()
+    return jsonify({"tables": tables, "columns": columns, "fks": fks})
+
+
+@server.route("/api/counts")
+def api_counts():
+    tables, _, _ = fetch_schema()
+    counts = fetch_table_counts(tables) if tables else []
+    return jsonify(counts)
+
+
+@server.route("/api/preview")
+def api_preview():
+    table = request.args.get("table")
+    if not table:
+        return jsonify({"columns": [], "rows": []})
+    try:
+        limit = int(request.args.get("limit") or ROW_LIMIT)
+    except Exception:
+        limit = ROW_LIMIT
+    df = fetch_table_preview(table, limit)
+    cols = list(df.columns) if not df.empty else []
+    rows = df.to_dict("records") if not df.empty else []
+    return jsonify({"columns": cols, "rows": rows})
+
+
+@server.route("/api/activity")
+def api_activity():
+    try:
+        limit = int(request.args.get("limit") or 20)
+    except Exception:
+        limit = 20
+    act = fetch_activity(limit)
+    return jsonify(act)

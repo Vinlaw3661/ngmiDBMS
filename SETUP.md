@@ -36,6 +36,7 @@ pip install -e .
 ### 4. Run Application
 ```bash
 python main.py
+
 ```
 
 ## Usage Examples
