@@ -173,13 +173,18 @@ cyto_stylesheet = [
         "style": {
             "content": "data(label)",
             "text-wrap": "wrap",
-            "text-max-width": 140,
-            "font-size": "10px",
+            "text-max-width": 220,
+            "text-valign": "center",
+            "text-halign": "center",
+            "font-size": "12px",
             "background-color": PRIMARY,
             "color": TEXT,
-            "padding": "10px",
+            "shape": "ellipse",
+            "padding": "6px",
             "width": "label",
             "height": "label",
+            "min-width": "180px",
+            "min-height": "130px",
             "border-width": 2,
             "border-color": "#2a5dcf",
             "box-shadow": "0 8px 18px rgba(0,0,0,0.35)",
@@ -191,9 +196,11 @@ cyto_stylesheet = [
             "curve-style": "bezier",
             "target-arrow-shape": "triangle",
             "label": "data(label)",
-            "font-size": "9px",
+            "font-size": "10px",
             "line-color": "#6ee7b7",
             "target-arrow-color": "#6ee7b7",
+            "width": 3,
+            "target-arrow-width": 10,
             "color": TEXT,
         },
     },
@@ -208,53 +215,90 @@ app.layout = html.Div(
         "fontFamily": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
     },
     children=[
-        html.H1("ngmiDBMS Dashboard", style={"marginBottom": "4px"}),
-        html.P(
-            "Schema graph, table previews, and live-ish activity from Postgres.",
-            style={"color": MUTED, "marginTop": "0"},
-        ),
-        dcc.Interval(id="refresh-interval", interval=REFRESH_MS, n_intervals=0),
-        html.Div(
-            className="controls",
-            children=[
-                html.Div(
-                    [
-                        html.Label("Table", style={"color": MUTED}),
-                        dcc.Dropdown(
-                            id="table-dropdown",
-                            placeholder="Select a table",
-                            style={"color": "#000", "backgroundColor": "#f8f9fa"},
-                        ),
-                    ],
-                    style={"flex": "1", "minWidth": "200px"},
-                ),
-                html.Div(
-                    [
-                        html.Label("Row limit", style={"color": MUTED}),
-                        dcc.Slider(
-                            id="row-limit",
-                            min=20,
-                            max=200,
-                            step=10,
-                            value=ROW_LIMIT,
-                            marks=None,
-                            tooltip={"placement": "bottom", "always_visible": False},
-                        ),
-                    ],
-                    style={"flex": "2", "minWidth": "250px"},
-                ),
-            ],
-            style={"display": "flex", "gap": "16px", "marginBottom": "16px"},
-        ),
         html.Div(
             style={
-                "display": "grid",
-                "gridTemplateColumns": "minmax(0, 2fr) minmax(0, 1fr)",
-                "gap": "16px",
+                "position": "sticky",
+                "top": 0,
+                "zIndex": 100,
+                "backgroundColor": BACKGROUND,
+                "padding": "12px 12px 16px",
+                "borderBottom": "1px solid rgba(255,255,255,0.06)",
             },
             children=[
                 html.Div(
-                    style={"minWidth": 0, "overflowX": "auto"},
+                    [
+                        html.H1("ngmiDBMS Dashboard", style={"marginBottom": "4px"}),
+                        html.P(
+                            "Schema graph, table previews, and live-ish activity from Postgres.",
+                            style={"color": MUTED, "marginTop": "0"},
+                        ),
+                    ]
+                ),
+                html.Div(
+                    className="controls",
+                    children=[
+                        html.Div(
+                            [
+                                html.Div("Table", style={"color": MUTED, "fontSize": "12px"}),
+                                dcc.Dropdown(
+                                    id="table-dropdown",
+                                    placeholder="Select a table",
+                                    style={"color": "#000", "backgroundColor": "#f8f9fa"},
+                                ),
+                            ],
+                            style={"flex": "1", "minWidth": "200px"},
+                        ),
+                        html.Div(
+                            [
+                                html.Div("Row limit", style={"color": MUTED, "fontSize": "12px"}),
+                                dcc.Slider(
+                                    id="row-limit",
+                                    min=20,
+                                    max=200,
+                                    step=10,
+                                    value=ROW_LIMIT,
+                                    marks=None,
+                                    tooltip={"placement": "bottom", "always_visible": False},
+                                ),
+                            ],
+                            style={"flex": "2", "minWidth": "250px"},
+                        ),
+                        html.Div(
+                            [
+                                html.Button(
+                                    "Reset",
+                                    id="reset-filters",
+                                    n_clicks=0,
+                                    style={
+                                        "marginTop": "20px",
+                                        "padding": "8px 14px",
+                                        "backgroundColor": PRIMARY,
+                                        "color": TEXT,
+                                        "border": "none",
+                                        "borderRadius": "8px",
+                                        "cursor": "pointer",
+                                    },
+                                )
+                            ],
+                            style={"display": "flex", "alignItems": "flex-end"},
+                        ),
+                    ],
+                    style={"display": "flex", "gap": "16px", "alignItems": "flex-end"},
+                ),
+            ],
+        ),
+        dcc.Interval(id="refresh-interval", interval=REFRESH_MS, n_intervals=0),
+        html.Div(
+            style={
+                "display": "flex",
+                "gap": "16px",
+                "alignItems": "flex-start",
+                "marginTop": "16px",
+                "flexWrap": "wrap",
+            },
+            children=[
+                html.Div(
+                    style={"minWidth": 0, "overflowX": "auto", "flex": 3},
                     children=[
                         cyto.Cytoscape(
                             id="schema-graph",
@@ -274,6 +318,8 @@ app.layout = html.Div(
                 html.Div(
                     id="table-stats",
                     style={
+                        "flex": 1,
+                        "minWidth": "260px",
                         "display": "grid",
                         "gridTemplateColumns": "repeat(auto-fit, minmax(140px, 1fr))",
                         "gap": "8px",
@@ -281,42 +327,70 @@ app.layout = html.Div(
                 ),
             ],
         ),
+        html.Div(
+            []
+        ),
         html.H3("Table Preview"),
-        dash_table.DataTable(
-            id="table-preview",
-            page_size=10,
-            style_table={
-                "overflowX": "auto",
-                "overflowY": "auto",
-                "maxHeight": "360px",
-                "backgroundColor": PANEL_BG,
-                "border": f"1px solid {PANEL_BG}",
-            },
-            style_cell={
-                "textAlign": "left",
-                "fontSize": "12px",
-                "backgroundColor": PANEL_BG,
-                "color": TEXT,
-                "border": "1px solid #23304a",
-            },
-            style_header={
-                "backgroundColor": "#1f2c45",
-                "color": TEXT,
-                "fontWeight": "bold",
-                "border": "1px solid #23304a",
-            },
+        html.Div(
+            [
+                html.Div(id="table-preview-caption", style={"color": MUTED, "marginBottom": "6px"}),
+                dcc.Loading(
+                    type="circle",
+                    children=[
+                        dash_table.DataTable(
+                            id="table-preview",
+                            page_size=10,
+                            sort_action="native",
+                            filter_action="native",
+                            style_table={
+                                "overflowX": "auto",
+                                "overflowY": "auto",
+                                "maxHeight": "360px",
+                                "backgroundColor": PANEL_BG,
+                                "border": f"1px solid {PANEL_BG}",
+                            },
+                            style_cell={
+                                "textAlign": "left",
+                                "fontSize": "12px",
+                                "backgroundColor": PANEL_BG,
+                                "color": TEXT,
+                                "border": "1px solid #23304a",
+                            },
+                            style_header={
+                                "backgroundColor": "#1f2c45",
+                                "color": TEXT,
+                                "fontWeight": "bold",
+                                "border": "1px solid #23304a",
+                            },
+                        )
+                    ],
+                ),
+                html.Div(id="table-preview-empty", style={"marginTop": "8px", "color": MUTED}),
+            ]
         ),
         html.H3("Recent Activity"),
         html.Div(
-            id="activity-feed",
-            style={
-                "backgroundColor": PANEL_BG,
-                "border": "1px solid #23304a",
-                "borderRadius": "10px",
-                "padding": "12px",
-                "maxHeight": "280px",
-                "overflowY": "auto",
-            },
+            [
+                html.Div(
+                    [
+                        html.Div("Log", style={"fontWeight": "bold"}),
+                    ],
+                    style={"marginBottom": "6px"},
+                ),
+                html.Div(
+                    id="activity-feed",
+                    style={
+                        "backgroundColor": PANEL_BG,
+                        "border": "1px solid #23304a",
+                        "borderRadius": "10px",
+                        "padding": "12px",
+                        "maxHeight": "280px",
+                        "overflowY": "auto",
+                        "fontFamily": "SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+                        "fontSize": "12px",
+                    },
+                ),
+            ]
         ),
     ],
 )
@@ -329,16 +403,20 @@ app.layout = html.Div(
     Output("table-stats", "children"),
     Output("activity-feed", "children"),
     Input("refresh-interval", "n_intervals"),
+    Input("reset-filters", "n_clicks"),
     State("table-dropdown", "value"),
 )
-def refresh_dashboard(n_intervals, current_table):
+def refresh_dashboard(n_intervals, reset_clicks, current_table):
     tables, columns, fks = fetch_schema()
     if not tables:
         return [], [], None, "No tables found.", "No activity."
 
+    trigger = dash.callback_context.triggered[0]["prop_id"].split(".")[0] if dash.callback_context.triggered else None
+    reset_requested = trigger == "reset-filters"
+
     elements = build_schema_elements(tables, columns, fks)
     options = [{"label": t, "value": t} for t in tables]
-    table_value = current_table if current_table in tables else tables[0]
+    table_value = tables[0] if reset_requested else (current_table if current_table in tables else tables[0])
 
     counts = fetch_table_counts(tables)
     stats_cards = [
@@ -359,21 +437,18 @@ def refresh_dashboard(n_intervals, current_table):
     ]
 
     activity = fetch_activity()
-    activity_nodes = (
-        html.Ul(
-            [
-                html.Li(
-                    f"{row['ts']}: {row['table_name']} - {row['summary']}",
-                    style={"color": TEXT},
-                )
-                for row in activity
-            ]
-        )
-        if activity
-        else "No recent activity."
-    )
+    if activity:
+        activity_nodes = [
+            html.Div(
+                f"[{row['ts']}] {row['table_name']}: {row['summary']}",
+                style={"color": TEXT, "marginBottom": "4px"},
+            )
+            for row in activity
+        ]
+    else:
+        activity_nodes = html.Div("No recent activity. Run a command or refresh.", style={"color": MUTED})
 
-    if n_intervals and current_table in tables:
+    if trigger == "refresh-interval" and current_table in tables and not reset_requested:
         return no_update, no_update, table_value, stats_cards, activity_nodes
 
     return elements, options, table_value, stats_cards, activity_nodes
@@ -382,17 +457,23 @@ def refresh_dashboard(n_intervals, current_table):
 @app.callback(
     Output("table-preview", "data"),
     Output("table-preview", "columns"),
+    Output("table-preview-caption", "children"),
+    Output("table-preview-empty", "children"),
     Input("table-dropdown", "value"),
     Input("row-limit", "value"),
     Input("refresh-interval", "n_intervals"),
 )
 def update_table_preview(table, row_limit, _):
     if not table:
-        return [], []
+        return [], [], "Select a table to preview rows.", ""
 
     df = fetch_table_preview(table, row_limit or ROW_LIMIT)
     columns = [{"name": col, "id": col} for col in df.columns]
-    return df.to_dict("records"), columns
+    caption = f"Showing up to {row_limit or ROW_LIMIT} rows from `{table}` ({len(df)} returned)."
+    empty_msg = ""
+    if df.empty:
+        empty_msg = "No rows returned. Try inserting data or increasing the row limit."
+    return df.to_dict("records"), columns, caption, empty_msg
 
 
 if __name__ == "__main__":
