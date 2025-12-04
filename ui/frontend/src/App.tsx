@@ -274,62 +274,61 @@ export default function App() {
         </div>
       </header>
 
-      <main className="portal-main portal-main-split">
-        <section className="portal-card auth-card">
-          <div className="auth-toggle">
-            <button
-              className={`toggle-btn ${authMode === 'signup' ? 'active' : ''}`}
-              onClick={() => setAuthMode('signup')}
-            >
-              Sign Up
-            </button>
-            <button
-              className={`toggle-btn ${authMode === 'login' ? 'active' : ''}`}
-              onClick={() => setAuthMode('login')}
-            >
-              Log In
-            </button>
-          </div>
-          <form className="auth-form" onSubmit={handleAuthSubmit}>
-            <label>
-              Email
-              <input
-                type="email"
-                required
-                value={authForm.email}
-                onChange={(e) => setAuthForm({ ...authForm, email: e.target.value })}
-              />
-            </label>
-            {authMode === 'signup' && (
+      <main className="portal-main">
+        {!user ? (
+          <section className="portal-card auth-card" style={{ maxWidth: '480px', margin: '0 auto' }}>
+            <div className="auth-toggle">
+              <button
+                className={`toggle-btn ${authMode === 'signup' ? 'active' : ''}`}
+                onClick={() => setAuthMode('signup')}
+              >
+                Sign Up
+              </button>
+              <button
+                className={`toggle-btn ${authMode === 'login' ? 'active' : ''}`}
+                onClick={() => setAuthMode('login')}
+              >
+                Log In
+              </button>
+            </div>
+            <form className="auth-form" onSubmit={handleAuthSubmit}>
               <label>
-                Full name
+                Email
                 <input
-                  type="text"
+                  type="email"
                   required
-                  value={authForm.fullName}
-                  onChange={(e) => setAuthForm({ ...authForm, fullName: e.target.value })}
+                  value={authForm.email}
+                  onChange={(e) => setAuthForm({ ...authForm, email: e.target.value })}
                 />
               </label>
-            )}
-            <label>
-              Password
-              <input
-                type="password"
-                required
-                value={authForm.password}
-                onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })}
-              />
-            </label>
-            <button type="submit" className="btn-primary btn-wide">
-              {authMode === 'signup' ? 'Create account' : 'Log in'}
-            </button>
-            {authMessage && <div className="form-note">{authMessage}</div>}
-            {user && <div className="form-note success">Signed in as {user.full_name}</div>}
-            {!user && <div className="form-note">Sign up or log in to access your dashboard.</div>}
-          </form>
-        </section>
-
-        <section className="portal-card dashboard-card">
+              {authMode === 'signup' && (
+                <label>
+                  Full name
+                  <input
+                    type="text"
+                    required
+                    value={authForm.fullName}
+                    onChange={(e) => setAuthForm({ ...authForm, fullName: e.target.value })}
+                  />
+                </label>
+              )}
+              <label>
+                Password
+                <input
+                  type="password"
+                  required
+                  value={authForm.password}
+                  onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })}
+                />
+              </label>
+              <button type="submit" className="btn-primary btn-wide">
+                {authMode === 'signup' ? 'Create account' : 'Log in'}
+              </button>
+              {authMessage && <div className="form-note">{authMessage}</div>}
+            </form>
+          </section>
+        ) : (
+          <section className="portal-card dashboard-card">
           <div className="dashboard-header">
             <div>
               <h2>User dashboard</h2>
@@ -406,7 +405,8 @@ export default function App() {
               )}
             </div>
           </div>
-        </section>
+          </section>
+        )}
       </main>
     </div>
   )
