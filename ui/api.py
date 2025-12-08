@@ -98,6 +98,32 @@ def apply(user_id: int = Form(...), job_id: int = Form(...), resume_id: int = Fo
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+@app.get("/api/users/{user_id}/applications")
+def get_applications(user_id: int):
+    """
+    Return all applications for a user, including any NGMI scores already generated.
+    """
+    try:
+        return job_service.get_user_applications(user_id)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.get("/api/applications/{application_id}/ngmi")
+def get_application_ngmi(application_id: int):
+    """
+    Return NGMI details for a specific application.
+    """
+    try:
+        details = job_service.get_ngmi_history(application_id)
+        if not details:
+            raise HTTPException(status_code=404, detail="Application not found or no NGMI score yet")
+        return details
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
 
 @app.get("/api/schema")
 def api_schema():

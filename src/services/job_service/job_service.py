@@ -52,7 +52,8 @@ def apply_to_job(user_id: int, job_id: int, resume_id: int) -> int:
             (user_id, job_id)
         )
         if existing:
-            raise JobApplicationError("You have already applied to this job")
+            # Return the existing application to surface its current NGMI score/comment
+            return existing["application_id"]
         
         # Validate resume belongs to user
         resume = db.execute_one(

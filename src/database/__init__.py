@@ -187,6 +187,31 @@ class Database:
                 "StartupXYZ",
                 "Technical PM with engineering background. Must understand software development lifecycle and user research.",
             ),
+            (
+                "Security Engineer",
+                "SecureWave",
+                "Own threat modeling, code scanning, and incident response playbooks. Experience with cloud security and SAST/DAST tools required.",
+            ),
+            (
+                "QA Automation Engineer",
+                "QualityLoop",
+                "Build and maintain Cypress/Playwright test suites, improve CI stability, and push release confidence metrics.",
+            ),
+            (
+                "Machine Learning Ops Engineer",
+                "ModelForge",
+                "Productionize ML models with feature stores, monitoring, and retraining pipelines. Kubernetes and Python preferred.",
+            ),
+            (
+                "Technical Writer",
+                "DocuCraft",
+                "Create API guides, tutorials, and release notes. Work closely with engineering to keep docs accurate and approachable.",
+            ),
+            (
+                "Customer Success Engineer",
+                "Northwind Apps",
+                "Advise enterprise customers, debug integration issues, and capture product feedback. Strong SQL and REST knowledge needed.",
+            ),
         ]
 
         for title, company, desc in sample_jobs:
