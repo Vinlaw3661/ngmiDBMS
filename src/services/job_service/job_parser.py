@@ -15,7 +15,7 @@ class JobParseError(Exception):
 class JobParser:
     def __init__(self):
         self.llm_driver = LLMDriver(
-            model_name=ModelNames.GPT_5, 
+            model_name=ModelNames.GPT_4_1, 
             provider=LLMProvider.OPENAI, 
             response_model=JobDetails,
             temperature=0.1

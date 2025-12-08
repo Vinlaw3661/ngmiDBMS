@@ -12,7 +12,7 @@ class ResumeUploadError(Exception):
 
 class ResumeService:
     def __init__(self):
-        self.llm_driver = LLMDriver(model_name=ModelNames.GPT_5, provider=LLMProvider.OPENAI, response_model=SkillExtractionResponseSchema, temperature=0.6)
+        self.llm_driver = LLMDriver(model_name=ModelNames.GPT_4_1, provider=LLMProvider.OPENAI, response_model=SkillExtractionResponseSchema, temperature=0.6)
         self.parser = ResumeParser()
         self.max_file_size = 10 * 1024 * 1024  # 10MB
         self.allowed_extensions = {'.pdf'}

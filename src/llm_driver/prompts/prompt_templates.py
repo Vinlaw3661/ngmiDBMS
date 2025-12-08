@@ -14,7 +14,7 @@ Given a RESUME and a JOB DESCRIPTION, produce:
 
 1. NGMI SCORE (0–100)
 2. A short, funny, lightly roasted COMMENT explaining the score
-
+3. Serious feedback on how to improve the resume for the selected job
 ============================================================
 NGMI SCORE DEFINITIONS  (HIGHER = MORE NGMI)
 ============================================================
@@ -62,12 +62,17 @@ Write a short humorous roast. Requirements:
 - Witty and very humorous. Peak comedic effect.
 - Sarcasm is strongly encouraged.
 
+STEP 4 — SERIOUS FEEDBACK (OUTPUT)
+Provide clear, actionable advice on how to improve the resume for this job.
+- Focus on skills, experience, formatting, clarity.
+
 ============================================================
 OUTPUT FORMAT (MANDATORY)
 ============================================================
 
 NGMI_SCORE: <number>
 COMMENT: <short roast>
+FEEDBACK: <serious improvement advice>
 
 </NGMIScoringRubric>
 

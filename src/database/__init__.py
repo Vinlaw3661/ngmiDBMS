@@ -152,6 +152,7 @@ class Database:
                 application_id INTEGER NOT NULL,
                 ngmi_score REAL NOT NULL,
                 ngmi_comment TEXT NOT NULL,
+                feedback TEXT,
                 generated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY(application_id) REFERENCES Applications(application_id)
             )""",

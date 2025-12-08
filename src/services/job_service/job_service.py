@@ -1,7 +1,6 @@
 from src.database import db
 from src.services.ngmi_service import generate_ngmi
 from src.database import db, DatabaseConnectionError
-from src.services.ngmi_service import generate_ngmi
 from src.services.job_service.job_parser import JobParser, JobParseError
 
 class JobApplicationError(Exception):
@@ -83,11 +82,11 @@ def apply_to_job(user_id: int, job_id: int, resume_id: int) -> int:
         try:
             ngmi_response = generate_ngmi(resume['raw_text'], job['description'])
 
-            ngmi_score, ngmi_comment = ngmi_response.not_gonna_make_it_score, ngmi_response.justification
+            ngmi_score, ngmi_comment, ngmi_feedback = ngmi_response.not_gonna_make_it_score, ngmi_response.justification, ngmi_response.feedback
 
             db.execute(
-                "INSERT INTO NGMIScores (application_id, ngmi_score, ngmi_comment) VALUES (%s, %s, %s)",
-                (application_id, ngmi_score, ngmi_comment)
+                "INSERT INTO NGMIScores (application_id, ngmi_score, ngmi_comment, feedback) VALUES (%s, %s, %s, %s)",
+                (application_id, ngmi_score, ngmi_comment, ngmi_feedback)
             )
         except Exception as e:
             # Application created but NGMI failed - still return success
